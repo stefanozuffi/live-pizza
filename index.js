@@ -45,7 +45,31 @@ const menu = [
     }
   ]
 
-//CRUD operations
+const drinks = [
+    {
+    id: 1,
+    name: 'tea drink',
+    price: 2.50
+    },
+
+    {
+    id: 2,
+    name: 'pepsi drink',
+    price: 3.00
+    },
+    {
+    id: 3,
+    name: 'water drink',
+    price: 1.50
+    },
+    {
+    id: 4,
+    name: 'orange juice drink',
+    price: 2.00
+}  
+]
+
+//CRUD operations on entity "pizzas"
 
 //Index
 app.get('/api/pizzas', (req, res) => {
@@ -84,4 +108,27 @@ app.patch('/api/pizzas/:id', (req, res)=> {
 //Destroy
 app.delete('/api/pizzas/:id', (req, res)=> {
     res.send('Delete the single pizza with id ' + req.params.id)
+})
+
+
+//CRUD operations on entity "drinks"
+
+//Index
+app.get('/api/drinks', (req, res) => {
+    res.json(drinks)
+})  
+
+//Show
+app.get('/api/drinks/:id', (req, res) => {
+    const drink_id = parseInt(req.params.id)
+    const drink = drinks.find(d => d.id === drink_id)
+
+    if (!drink) {
+        res.status(404).json({
+            error: true,
+            message: 'Drink not Found'
+        })
+    } else {
+        res.json(drink)
+    }
 })
