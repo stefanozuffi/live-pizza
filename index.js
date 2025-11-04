@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
+const connection = require('./connection.js')
 
 
 app.use(express.static('public'))
@@ -73,21 +74,35 @@ const drinks = [
 
 //Index
 app.get('/api/pizzas', (req, res) => {
-    res.json(menu)
+    const sql = 'SELECT * FROM pizzas'
+
+    connection.query(sql, (err, results) => {
+        if (err) return res.status(500).json({error: 'Database query failed'});
+        res.json(results);
+    })
+
+
 })
 
 //Show
 app.get('/api/pizzas/:id', (req, res) => {
     const pizzaId = parseInt(req.params.id)
-    const pizza = menu.find(p => p.id === pizzaId)
-    if (pizza) {
-        res.json(pizza)
-    } else {
-        res.status(404).json({
-            error: true,
-            message: 'Pizza Not Found'
-        })
-    }
+    const sql = 'SELECT * FROM pizzas WHERE id = ?'
+
+    connection.query(sql, [pizzaId], (err, results) => {
+        if (err) return res.status(404).json({error: 'Pizza item not found'}); 
+        res.json(results)
+    })
+
+    // const pizza = menu.find(p => p.id === pizzaId)
+    // if (pizza) {
+    //     res.json(pizza)
+    // } else {
+    //     res.status(404).json({
+    //         error: true,
+    //         message: 'Pizza Not Found'
+    //     })
+    // }
 })
 
 //Store
@@ -107,7 +122,14 @@ app.patch('/api/pizzas/:id', (req, res)=> {
 
 //Destroy
 app.delete('/api/pizzas/:id', (req, res)=> {
-    res.send('Delete the single pizza with id ' + req.params.id)
+    const { id } = req.params
+
+    const sql = 'DELETE FROM pizzas WHERE id = ?'
+
+    connection.query(sql, [id], (err) => {
+        if (err) return res.status(500).json({error: 'Server Error: object was NOT deleted from db'});
+        res.sendStatus(204)
+    })
 })
 
 
